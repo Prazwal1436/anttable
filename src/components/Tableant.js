@@ -21,15 +21,17 @@ export default function Tableant() {
       interval: el?.interval || "second",
     };
   });
-
   const[data,setData] = useState(NewData);
   const[drop, setDrop]= useState([]);
   const [dropvalue,setDropvalue]=useState("");
+  const [isChecked, setIsChecked] = useState(false);
+  const [alert, setAlert]=useState("");
 
 
   const handleChange = (e) => {
     e.preventDefault();
     const { name, value , id } = e.target;
+    
   console.log(data);  
   setData(data.map((el) => {
     if(el.id==id){
@@ -43,6 +45,7 @@ export default function Tableant() {
   }}
 }));   
 };
+
 
 const handleadd = (e,index) => {
   e.preventDefault();
@@ -72,14 +75,21 @@ const handleDelete=(e,index)=>{
 
 const dropmapping = drop.map((el)=>{
   return(
-    <option>{el}</option>
+    <option value={el}>{el}</option>
   )
 })
 
     const tablemapping = data.map((el , index )=>{
+
+     
       let ingredents = el.IngredientName;
       let categories =el.CategoryTitle;
       let subcatagories = el.RecipeSubCategoryTitle;
+      let biologicalHazardTitle = el.BiologicalHazardTitle;
+      let buttonDis = "disabled"
+      if(el.duration&& el.maxUnit&& el.minUnit){
+        buttonDis = " btn-primary enable"
+      }
       let deleteRow =false;
       if(index>=1){
         let ind = [index]-1;
@@ -95,15 +105,17 @@ const dropmapping = drop.map((el)=>{
       if(el?.RecipeSubCategoryTitle===data[ind].RecipeSubCategoryTitle){
         subcatagories= null;
       }
-
+      if(el?.BiologicalHazardTitle===data[ind].BiologicalHazardTitle){
+        biologicalHazardTitle= null;
+      }
     }
       return(
-      <tr key={el?.id}>      <td>{ingredents}</td>
+      <tr>      <td>{ingredents}</td>
       <td>{categories}</td>
       <td>{subcatagories}</td>
-      <td>{el?.BiologicalHazardTitle}</td>
+      <td>{biologicalHazardTitle}</td>
       <td className='center'><input type='checkbox'/></td>
-      <td className='m-1 row'><select className='col form-select'>
+      <td className='m-1 row'><select className='col form-select' name='process' id={el.id} value={el.process} onSelect={handleChange}>
         {dropmapping}
         </select> <li className="nav nav-item dropdown col">
           <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -112,13 +124,13 @@ const dropmapping = drop.map((el)=>{
             <li className='row m-1 '><input type='text ' className='col form-control m-1' value={dropvalue} onChange={handleDrop}/><button className='col btn btn-primary m-1' onClick={handleDropAdd}>add</button></li>
           </ul>
         </li></td>
-      <td><input type='text' name='minUnit' id={el?.id} value={el?.minUnit} className='form-control' onChange={ handleChange}/></td>
-      <td><input type='text' className='form-control' name='maxUnit' id={el?.id} value={el?.maxUnit}  onChange={handleChange}/></td>
+      <td><input type='number' name='minUnit' id={el?.id} value={el?.minUnit} className='form-control' onChange={ handleChange}/></td>
+      <td><input type='number' className='form-control' name='maxUnit' id={el?.id} value={el?.maxUnit}  onChange={handleChange}/></td>
       <td><input type='number' className='form-control' name='duration' id={el?.id} value={el?.duration} onChange={handleChange}/></td>
       <td><select className='form-select'>
         <option>{el?.interval}</option>
         </select></td>
-      <td><button type="submit" className="btn btn-primary m-1">Analyse</button></td>
+      <td><button type="submit" className={` btn ${buttonDis} m-1`} >Analyse</button></td>
       <td><button type="submit" className="btn btn-primary " onClick={(e)=>handleadd(e, index)}>Add</button>
       {deleteRow?<><button className=' btn btn-danger ms-1' onClick={(e)=>handleDelete(e, index,el)}>delete</button></>:null}
       </td>
